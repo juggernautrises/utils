@@ -14,13 +14,13 @@ athlete_stats = athlete_stats_req.json()
 
 bikes = athlete_info.get('bikes')
 #pprint.pprint(athlete_stats)
-total_distance = athlete_stats.get('all_ride_totals').get('distance')
+total = total_distance = athlete_stats.get('all_ride_totals').get('distance')
 for bike in bikes:
 	name = bike.get('name')
 	
 
 	if name != 'Poop Machine':
-		print name, "%.2f" % (bike.get('distance') * .000621371192)
+		print (name+":", "%.2f" % (bike.get('distance') * .000621371192))
 		total_distance = total_distance - bike.get('distance')
-print "%.2f" % (total_distance * .000621371192)
-
+print("Poop Machine: %.2f" % (total_distance * .000621371192))
+print("Total mileage: %.2f" % (total * .000621371192))
