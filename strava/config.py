@@ -1,0 +1,7 @@
+ACTIVITIES_URL = 'https://www.strava.com/api/v3/activities'
+ATHLETE_STATS_URL = ''
+ATHLETE_URL = 'https://www.strava.com/api/v3/athlete'
+CLIENT_ID = ''
+CLIENT_SECRET = ''
+OAUTH_TOKEN_URL = 'https://www.strava.com/oauth/token'
+STRAVA_REFRESH_TOKEN = ''
