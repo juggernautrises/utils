@@ -1,3 +1,4 @@
+import datetime
 import json
 import time
 from pathlib import Path
@@ -5,6 +6,8 @@ from pathlib import Path
 import requests
 
 from config import ATHLETE_STATS_URL, ATHLETE_URL, CLIENT_ID, CLIENT_SECRET, OAUTH_TOKEN_URL, STRAVA_REFRESH_TOKEN
+
+METERS_TO_MILES = 0.00062
 
 
 class StravaBase(object):
@@ -45,8 +48,26 @@ class StravaBase(object):
         return resp.json()
 
 
+class Stats(StravaBase):
+    def ytd_totals(self):
+        _stats = {}
+        day_of_year = datetime.datetime.now().timetuple().tm_yday
+        stats = self.make_request(ATHLETE_STATS_URL)
+        _stats['ytd_ride'] = round((stats['ytd_ride_totals']['distance']
+                                    * METERS_TO_MILES), 2)
+        _stats['ytd_run'] = round((stats['ytd_run_totals']['distance']
+                                   * METERS_TO_MILES), 2)
+        _stats['avg_run'] = round(_stats['ytd_run'] / day_of_year, 2)
+        _stats['avg_ride'] = round(_stats['ytd_ride'] / day_of_year, 2)
+        return _stats
+
+
 class GearCheck(StravaBase):
+
     def list_gear(self):
+        _stats = {'bikes': [],
+                  'total_distance': 0
+                  }
         info = self.make_request(ATHLETE_URL)
         stats = self.make_request(ATHLETE_STATS_URL)
         bikes = info['bikes']
@@ -55,12 +76,9 @@ class GearCheck(StravaBase):
             name = bike['name']
             if name == 'Poop Machine':
                 continue
-            print(f"{name}:", f"{(bike['distance'] * .000621371192):.2f}")
+            _stats['bikes'].append({'name': name, 'distance': round(bike['distance'] * METERS_TO_MILES, 2)})
             total_distance -= bike['distance']
 
-        print(f"Poop Machine: {total_distance * .000621371192:.2f}")
-        print(f"Total mileage: {total * .000621371192:.2f}")
-
-
-if __name__ == '__main__':
-    GearCheck().list_gear()
+        _stats['bikes'].append({'name': 'Poop Machine', 'distance': round(total_distance * METERS_TO_MILES, 2)})
+        _stats['total_distance'] = round(total * METERS_TO_MILES, 2)
+        return _stats
